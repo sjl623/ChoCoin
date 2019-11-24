@@ -1,25 +1,46 @@
 package cn.scnu.team.FullNode;
 
-import java.net.InetSocketAddress;
-import java.net.URI;
-import java.net.URISyntaxException;
+import cn.scnu.team.API.Message;
+import cn.scnu.team.API.NodeInfo;
+import com.alibaba.fastjson.JSON;
+import org.java_websocket.enums.ReadyState;
+
+import java.io.IOException;
+import java.net.*;
 
 public class FullNode {
-    static class Server extends Thread{
-        public void run(){
-            String host="localhost";
-            int port=9000;
+    private static SocketServer socketServer;
 
-            SocketServer socketServer=new SocketServer(new InetSocketAddress(host,port));
+    static class Server extends Thread {
+        public void run() {
+            String host = "0.0.0.0";
+            int port = 0;
+            try {
+                ServerSocket s = new ServerSocket(0);
+                port=s.getLocalPort();
+                s.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+            socketServer = new SocketServer(new InetSocketAddress(host, port));
             socketServer.run();
         }
     }
 
-    public static void main(String[] args) throws URISyntaxException, InterruptedException {
-        Thread server=new Server();
+    public static void main(String[] args) throws URISyntaxException, InterruptedException, MalformedURLException {
+        Thread server = new Server();
         server.start();
-        //Thread.sleep(1000);
-        SocketClient socketClient=new SocketClient(new URI("ws://localhost:9000"));
-        socketClient.connect();
+        SeedSocketClient seedSocketClient = new SeedSocketClient(new URI("ws://localhost:5000"));
+        seedSocketClient.connect();
+
+        NodeInfo nodeInfo=new NodeInfo(socketServer.getAddress().getHostName(),socketServer.getAddress().getPort());
+        //System.out.println(JSON.toJSONString(nodeInfo));
+        while (!seedSocketClient.getReadyState().equals(ReadyState.OPEN)) {
+        }
+        Message message=new Message("add",JSON.toJSONString(nodeInfo));
+        seedSocketClient.send(JSON.toJSONString(message));
+        seedSocketClient.send(JSON.toJSONString(new Message("query","")));
+
     }
 }
