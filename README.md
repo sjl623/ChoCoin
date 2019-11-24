@@ -7,6 +7,7 @@ A digital coin based on block chain technology,like Bitcoin.
 ## Project structure
 The project's file structure as follows:\
 ├── Account\
+|── SeedNode\
 ├── BlockChain\
 ├── FullNode\
 ├── LightNode\
@@ -14,6 +15,8 @@ The project's file structure as follows:\
 ├── Transaction\
 └── Util\
 Here are more details about each directory\
+
+- **SeedNode** SeedNode is used to help a node find other node in the network.
 
 - **Full(Light)Node** Here are the source of the full node or light node client.After built by maven,a jar executable file should got.Then the one who participate in our game could run it.\
 In other word,we would get two .jar file in the end.
