@@ -3,6 +3,7 @@ package cn.scnu.team.SeedNode;
 import cn.scnu.team.API.NodeInfo;
 import cn.scnu.team.API.Message;
 
+import cn.scnu.team.API.Response;
 import com.alibaba.fastjson.JSON;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
@@ -55,7 +56,8 @@ public class SeedNode {
 
             if(message.methodName.equals("query")){
                 String result= JSON.toJSONString(allNode);
-                webSocket.send(result);
+                Response response=new Response("nodeList",result);
+                webSocket.send(JSON.toJSONString(response));
             }
 
         }
