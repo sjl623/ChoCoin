@@ -3,6 +3,7 @@ package cn.scnu.team;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import cn.scnu.team.Account.Account;
 import cn.scnu.team.Util.Encryption;
 import cn.scnu.team.Util.Hash;
 
@@ -53,6 +54,12 @@ public class AppTest
         }
         merkle.build();
         merkle.output();
+    }
+
+    @Test
+    public void testFileRead(){
+        Account account=new Account();
+        //account.loadInfo("aaa");
     }
 
 }

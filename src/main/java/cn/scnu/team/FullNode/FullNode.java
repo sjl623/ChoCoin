@@ -2,12 +2,15 @@ package cn.scnu.team.FullNode;
 
 import cn.scnu.team.API.Message;
 import cn.scnu.team.API.NodeInfo;
+import cn.scnu.team.Account.Account;
 import cn.scnu.team.Util.Hash;
 import com.alibaba.fastjson.JSON;
 import org.java_websocket.enums.ReadyState;
 
 import java.io.IOException;
 import java.net.*;
+import java.security.NoSuchAlgorithmException;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 public class FullNode {
@@ -50,7 +53,13 @@ public class FullNode {
     }
 
 
-    public static void main(String[] args) throws URISyntaxException, InterruptedException, MalformedURLException {
+    public static void main(String[] args) throws URISyntaxException, InterruptedException, IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+        System.out.printf("Enter account's file name:");
+        Scanner scanner=new Scanner(System.in);
+        String filename=scanner.next();
+        Account account=new Account();
+        account.loadInfo(filename);
+
         Thread server = new Server();
         server.start();
         seedSocketClient = new SeedSocketClient(new URI("ws://localhost:5000"));
