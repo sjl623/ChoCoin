@@ -6,6 +6,7 @@ import static org.junit.Assert.assertTrue;
 import cn.scnu.team.Util.Encryption;
 import cn.scnu.team.Util.Hash;
 
+import cn.scnu.team.Util.Merkle;
 import org.junit.Test;
 
 import java.security.NoSuchAlgorithmException;
@@ -44,6 +45,14 @@ public class AppTest
         String decPri=encryption.decryptPrivate(encPub);
         assertEquals(testStr,decPri);
     }
-    
+    @Test
+    public void testMerkle(){
+        Merkle merkle=new Merkle();
+        for(int i=0;i<10;i++){
+            merkle.add(String.valueOf(i));
+        }
+        merkle.build();
+        merkle.output();
+    }
 
 }
