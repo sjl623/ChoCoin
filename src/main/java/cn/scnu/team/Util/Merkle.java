@@ -6,20 +6,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Merkle {
-    List<String> info = new ArrayList<String>();
-    List<List<String>> tree = new ArrayList<List<String>>();
-    int len = 0;
+    public List<String> info = new ArrayList<String>();
+    public List<List<String>> tree = new ArrayList<List<String>>();
 
     public void add(String str) {
         info.add(str);
     }
 
     public void build() {
-        int len = 0;
         while (tree.size() == 0 || tree.get(tree.size() - 1).size() != 1) {
             List<String> nowLayer = new ArrayList<String>();
             if (tree.size() == 0) {
-                for (int i = 0; i < info.size(); i++) nowLayer.add(Hash.sha256(info.get(i)));
+                for (String s : info) nowLayer.add(Hash.sha256(s));
             } else {
                 int lastLayerID = tree.size() - 1;
                 List<String> lastLayer = tree.get(lastLayerID);
@@ -31,7 +29,6 @@ public class Merkle {
                 }
             }
             tree.add(nowLayer);
-            len++;
         }
     }
 

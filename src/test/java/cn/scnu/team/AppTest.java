@@ -12,6 +12,8 @@ import org.junit.Test;
 
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.List;
+import java.util.Random;
 
 /**
  * Unit test for simple App.
@@ -49,11 +51,25 @@ public class AppTest
     @Test
     public void testMerkle(){
         Merkle merkle=new Merkle();
+        Random random=new Random();
         for(int i=0;i<10;i++){
-            merkle.add(String.valueOf(i));
+            merkle.add(String.valueOf(random.nextInt()));
         }
         merkle.build();
         merkle.output();
+        String nowHash=null;
+        for(int i=0;i<merkle.tree.size()-1;i+=1){
+            List<String> nowLayer=merkle.tree.get(i);
+            List<String> nextLayer=merkle.tree.get(i+1);
+            for(int j=0;j<nowLayer.size();j+=2){
+                if(j==nowLayer.size()-1){
+                    nowHash=Hash.sha256(nowLayer.get(j)+nowLayer.get(j));
+                }else{
+                    nowHash=Hash.sha256(nowLayer.get(j)+nowLayer.get(j+1));
+                }
+                assertEquals(nowHash,nextLayer.get(j/2));
+            }
+        }
     }
 
     @Test

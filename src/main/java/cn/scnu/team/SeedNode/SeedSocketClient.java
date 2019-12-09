@@ -1,7 +1,9 @@
-package cn.scnu.team.FullNode;
+package cn.scnu.team.SeedNode;
 
 import cn.scnu.team.API.NodeInfo;
 import cn.scnu.team.API.Response;
+import cn.scnu.team.FullNode.FullNode;
+import cn.scnu.team.LightNode.LightNode;
 import com.alibaba.fastjson.JSON;
 import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.handshake.ServerHandshake;
@@ -11,9 +13,10 @@ import java.net.URISyntaxException;
 import java.util.List;
 
 public class SeedSocketClient extends WebSocketClient {
-
-    public SeedSocketClient(URI serverUri) {
+    private boolean isFullNode;
+    public SeedSocketClient(URI serverUri,boolean isFullNode) {
         super(serverUri);
+        this.isFullNode=isFullNode;
     }
 
     @Override
@@ -29,7 +32,8 @@ public class SeedSocketClient extends WebSocketClient {
             List<NodeInfo> nodeInfo= JSON.parseArray(response.getContent(),NodeInfo.class);
             for(int i=0;i<nodeInfo.size();i++){
                 try {
-                    FullNode.addNode(nodeInfo.get(i));
+                    if(isFullNode) FullNode.addNode(nodeInfo.get(i));
+                    else LightNode.addNode(nodeInfo.get(i));
                 } catch (URISyntaxException e) {
                     e.printStackTrace();
                 }
