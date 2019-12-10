@@ -26,7 +26,7 @@ public class SeedSocketClient extends WebSocketClient {
 
     @Override
     public void onMessage(String s) {
-        System.out.println(s);
+        //System.out.println(s);
         Response response=JSON.parseObject(s,Response.class);
         if(response.getType().equals("nodeList")){
             List<NodeInfo> nodeInfo= JSON.parseArray(response.getContent(),NodeInfo.class);

@@ -38,6 +38,7 @@ public class Account {
         }
     }
 
+    public AccountInfo info;
     public Encryption encryption;
 
     public Account() {
@@ -57,10 +58,10 @@ public class Account {
 
         if (isExists) {
             FileReader fileReader = new FileReader(System.getProperties().getProperty("user.dir")+System.getProperties().getProperty("file.separator")+path);
-            AccountInfo accountInfo = JSON.parseObject(fileReader.readString(), AccountInfo.class);
+            info = JSON.parseObject(fileReader.readString(), AccountInfo.class);
             try {
-                encryption.setPublicKey(accountInfo.publicKey);
-                encryption.setPrivateKey(accountInfo.privateKey);
+                encryption.setPublicKey(info.publicKey);
+                encryption.setPrivateKey(info.privateKey);
             } catch (Exception e) {
                 System.out.println("Invalid account file.");
                 System.exit(0);
@@ -70,9 +71,9 @@ public class Account {
         } else {
             FileWriter fileWriter = new FileWriter(System.getProperties().getProperty("user.dir")+System.getProperties().getProperty("file.separator")+path);
             encryption.randomPairKey();
-            AccountInfo accountInfo = new AccountInfo(encryption.getPublicKeyStr(), encryption.getPrivateKeyStr());
+            info= new AccountInfo(encryption.getPublicKeyStr(), encryption.getPrivateKeyStr());
 
-            fileWriter.write(JSON.toJSONString(accountInfo));
+            fileWriter.write(JSON.toJSONString(info));
             fileWriter.close();
             System.out.println("Account initialization success,new account created");
         }

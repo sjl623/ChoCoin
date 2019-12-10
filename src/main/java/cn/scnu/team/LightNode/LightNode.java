@@ -5,7 +5,11 @@ import cn.scnu.team.API.NodeInfo;
 import cn.scnu.team.Account.Account;
 import cn.scnu.team.SeedNode.SeedSocketClient;
 import cn.scnu.team.FullNode.SocketClient;
+import cn.scnu.team.Transaction.TransDetail;
+import cn.scnu.team.Transaction.Transaction;
 import com.alibaba.fastjson.JSON;
+import io.airlift.airline.*;
+import org.java_websocket.client.WebSocketClient;
 import org.java_websocket.enums.ReadyState;
 
 import java.io.IOException;
@@ -16,44 +20,89 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 public class LightNode {
-    private static Map<String, Boolean> isConnect= new HashMap<>();
+    private static Map<String, Boolean> isConnect = new HashMap<>();
     private static Vector<SocketClient> nodeSocket = new Vector<>();
     private static SeedSocketClient seedSocketClient;
 
+    static Scanner scanner;
+    static Account accountInfo;
+
     private static class updateNode extends TimerTask {
         @Override
-        public void run(){
-            if(nodeSocket.size()<=200){//get new node while connection less 200
-                seedSocketClient.send(JSON.toJSONString(new Message("query","")));
+        public void run() {
+            if (nodeSocket.size() <= 200) {//get new node while connection less 200
+                seedSocketClient.send(JSON.toJSONString(new Message("query", "")));
             }
         }
     }
 
     public static void addNode(NodeInfo newNodeInfo) throws URISyntaxException {
-        if(!isConnect.containsKey(newNodeInfo.address+":"+newNodeInfo.port)){
-            SocketClient socketClient=new SocketClient(new URI("ws://"+newNodeInfo.address+":"+newNodeInfo.port));
+        if (!isConnect.containsKey(newNodeInfo.address + ":" + newNodeInfo.port)) {
+            SocketClient socketClient = new SocketClient(new URI("ws://" + newNodeInfo.address + ":" + newNodeInfo.port));
             socketClient.connect();
-            isConnect.put(newNodeInfo.address+":"+newNodeInfo.port,true);
+            isConnect.put(newNodeInfo.address + ":" + newNodeInfo.port, true);
+            nodeSocket.add(socketClient);
+        }
+    }
+
+    @Command(name = "transfer", description = "Transfer some coin to other account.")
+    public static class Transfer implements Runnable {
+        @Option(name = {"-a"}, description = "The goal account address", required = true)
+        String account;
+        @Option(name = {"-m"}, description = "The amount", required = true)
+        Double amount;
+
+        @Override
+        public void run() {
+            TransDetail transDetail = new TransDetail(accountInfo.info.getPublicKey(), account, amount, String.valueOf(System.currentTimeMillis()));
+            String transDetailStr = JSON.toJSONString(transDetail);
+            Transaction transaction = new Transaction(transDetailStr, accountInfo.encryption.encryptPrivate(transDetailStr));
+            String transactionStr = JSON.toJSONString(transaction);
+            Message message=new Message("transaction",transactionStr);
+            String messageStr=JSON.toJSONString(message);
+            for (SocketClient nowSocket:nodeSocket) {
+                nowSocket.send(messageStr);
+            }
+            System.out.printf(transactionStr);
         }
     }
 
     public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException, URISyntaxException {
         System.out.print("Enter account's file name:");
-        Scanner scanner=new Scanner(System.in);
-        String filename=scanner.next();
-        Account account=new Account();
-        account.loadInfo(filename);
+        scanner = new Scanner(System.in);
+        String filename = scanner.nextLine();
+        accountInfo = new Account();
+        accountInfo.loadInfo(filename);
 
-        seedSocketClient = new SeedSocketClient(new URI("ws://localhost:5000"),false);
+        seedSocketClient = new SeedSocketClient(new URI("ws://localhost:5000"), false);
         seedSocketClient.connect();
         System.out.println("Linking to the seed node...");
         while (!seedSocketClient.getReadyState().equals(ReadyState.OPEN)) {
         }
-        Timer nodeQueryTimer=new Timer();
-        nodeQueryTimer.scheduleAtFixedRate(new updateNode(),1000,5000);
-        while(true){
-            String nowCom=scanner.next();
-            System.out.println(nowCom);
+        Timer nodeQueryTimer = new Timer();
+        nodeQueryTimer.scheduleAtFixedRate(new updateNode(), 1000, 5000);
+
+
+        Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder("ChoCoin")
+                .withDescription("ChoCoin Light node")
+                .withDefaultCommand(Help.class)
+                .withCommands(Help.class, Transfer.class);
+
+
+        Cli<Runnable> commandParser = builder.build();
+
+        while (true) {
+            String nowCom = scanner.nextLine();
+            String[] nowArg = nowCom.split(" ");
+            try {
+                commandParser.parse(nowArg).run();
+            } catch (ParseException e) {
+                System.out.println(e.getMessage());
+                System.out.println("Invalid command,type \"help\" for usage instructions.");
+            }
         }
+
     }
+
+
 }

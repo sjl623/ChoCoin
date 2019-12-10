@@ -49,6 +49,7 @@ public class FullNode {
             SocketClient socketClient=new SocketClient(new URI("ws://"+newNodeInfo.address+":"+newNodeInfo.port));
             socketClient.connect();
             isConnect.put(newNodeInfo.address+":"+newNodeInfo.port,true);
+            nodeSocket.add(socketClient);
         }
     }
 

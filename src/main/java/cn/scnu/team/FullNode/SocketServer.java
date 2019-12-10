@@ -24,7 +24,7 @@ public class SocketServer extends WebSocketServer {
 
     @Override
     public void onMessage(WebSocket webSocket, String s) {
-
+        System.out.println(s);
     }
 
     @Override
