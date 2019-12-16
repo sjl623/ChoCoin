@@ -16,8 +16,13 @@ import java.util.*;
 public class FullNode {
     private static SocketServer socketServer;
     private static SeedSocketClient seedSocketClient;
+
     static Vector<SocketClient> nodeSocket = new Vector<>();
     private static Map<String, Boolean> isConnect= new HashMap<>();
+
+    static Map<String,String> toPackTrans=new HashMap<>();
+
+
     static class Server extends Thread {
         public void run() {
             String host = "0.0.0.0";

@@ -7,6 +7,7 @@ import cn.scnu.team.SeedNode.SeedSocketClient;
 import cn.scnu.team.FullNode.SocketClient;
 import cn.scnu.team.Transaction.TransDetail;
 import cn.scnu.team.Transaction.Transaction;
+import cn.scnu.team.Util.Hash;
 import com.alibaba.fastjson.JSON;
 import io.airlift.airline.*;
 import org.java_websocket.client.WebSocketClient;
@@ -56,7 +57,8 @@ public class LightNode {
         public void run() {
             TransDetail transDetail = new TransDetail(accountInfo.info.getPublicKey(), account, amount, String.valueOf(System.currentTimeMillis()));
             String transDetailStr = JSON.toJSONString(transDetail);
-            Transaction transaction = new Transaction(transDetailStr, accountInfo.encryption.encryptPrivate(transDetailStr));
+            String detailHash= Hash.sha256(transDetailStr);
+            Transaction transaction = new Transaction(transDetailStr, accountInfo.encryption.encryptPrivate(detailHash));
             String transactionStr = JSON.toJSONString(transaction);
             Message message=new Message("transaction",transactionStr);
             String messageStr=JSON.toJSONString(message);
