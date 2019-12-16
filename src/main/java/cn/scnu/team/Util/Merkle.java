@@ -14,6 +14,7 @@ public class Merkle {
     }
 
     public void build() {
+        if(info.size()==0) return;
         while (tree.size() == 0 || tree.get(tree.size() - 1).size() != 1) {
             List<String> nowLayer = new ArrayList<String>();
             if (tree.size() == 0) {

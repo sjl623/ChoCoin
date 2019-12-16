@@ -63,7 +63,7 @@ public class LightNode {
             Message message=new Message("transaction",transactionStr);
             String messageStr=JSON.toJSONString(message);
             for (SocketClient nowSocket:nodeSocket) {
-                nowSocket.send(messageStr);
+                if(nowSocket.isOpen())  nowSocket.send(messageStr);
             }
             System.out.printf(transactionStr);
         }
