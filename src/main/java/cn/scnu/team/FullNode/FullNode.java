@@ -28,22 +28,34 @@ public class FullNode {
     public static Vector<Block> block=new Vector<>();
 
     public static Account account;
+    static final Object globalLock=new Object();
 
     static class Pack extends Thread{
         public void run(){
             while(true){
                 //System.out.println("hi");
-                String res=Pow.pack();
-                if(res!=null){
-                    Block nowBlock=JSON.parseObject(res,Block.class);
-                    block.add(nowBlock);
-                    for (SocketClient nowSocket:nodeSocket) {
-                        if(nowSocket.isOpen()){
-                            Message message=new Message("newBlock",res);
-                            nowSocket.send(JSON.toJSONString(message));
+                try {
+                    System.out.println(JSON.toJSONString(block));
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+                synchronized (globalLock){
+                    String res=Pow.pack();
+                    if(res!=null){
+                        Block nowBlock=JSON.parseObject(res,Block.class);
+                        block.add(nowBlock);
+                        for (SocketClient nowSocket:nodeSocket) {
+                            if(nowSocket.isOpen()){
+                                System.out.println("Send to a node");
+                                Message message=new Message("newBlock",res);
+                                nowSocket.send(JSON.toJSONString(message));
+                            }
                         }
+                        toPackTrans.clear();
                     }
                 }
+
             }
         }
     }
@@ -76,11 +88,13 @@ public class FullNode {
     }
 
     public static void addNode(NodeInfo newNodeInfo) throws URISyntaxException {
-        if(!isConnect.containsKey(newNodeInfo.address+":"+newNodeInfo.port)){
-            SocketClient socketClient=new SocketClient(new URI("ws://"+newNodeInfo.address+":"+newNodeInfo.port));
-            socketClient.connect();
-            isConnect.put(newNodeInfo.address+":"+newNodeInfo.port,true);
-            nodeSocket.add(socketClient);
+        synchronized (FullNode.globalLock){
+            if(!isConnect.containsKey(newNodeInfo.address+":"+newNodeInfo.port)){
+                SocketClient socketClient=new SocketClient(new URI("ws://"+newNodeInfo.address+":"+newNodeInfo.port));
+                socketClient.connect();
+                isConnect.put(newNodeInfo.address+":"+newNodeInfo.port,true);
+                //nodeSocket.add(socketClient);
+            }
         }
     }
 

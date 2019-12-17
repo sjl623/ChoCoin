@@ -12,11 +12,7 @@ import java.util.Vector;
 
 public class Pow {
     public static String pack(){
-        try {
-            Thread.sleep(500);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+
         if(FullNode.toPackTrans.size()==0) return null;
         Random r = new Random();
         Merkle merkle=new Merkle();
@@ -32,7 +28,7 @@ public class Pow {
         //System.out.println("build");
         String preHash="";
         if(FullNode.block.size()==0) preHash= Hash.sha256("");
-        else preHash= FullNode.block.get(FullNode.block.size() - 1).getPreHash();
+        else preHash= FullNode.block.get(FullNode.block.size() - 1).getRootMerkleHash();
         int nonce=r.nextInt();
         Block newBlock=new Block(preHash,rootHash,JSON.toJSONString(nowAllTrans),nonce,System.currentTimeMillis(),FullNode.account.encryption.getPublicKeyStr());
         String BlockSha256=Hash.sha256(JSON.toJSONString(newBlock));

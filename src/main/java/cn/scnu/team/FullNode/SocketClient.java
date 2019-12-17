@@ -18,6 +18,7 @@ public class SocketClient extends WebSocketClient {
     @Override
     public void onOpen(ServerHandshake serverHandshake) {
         System.out.println("connect to a node success.");
+
         FullNode.nodeSocket.add(this);
     }
 

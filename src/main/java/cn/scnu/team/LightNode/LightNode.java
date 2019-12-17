@@ -65,7 +65,7 @@ public class LightNode {
             for (SocketClient nowSocket:nodeSocket) {
                 if(nowSocket.isOpen())  nowSocket.send(messageStr);
             }
-            System.out.printf(transactionStr);
+            System.out.println(transactionStr);
         }
     }
 

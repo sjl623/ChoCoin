@@ -14,9 +14,11 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
+import javax.rmi.CORBA.Util;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.ArrayList;
 import java.util.Vector;
 
 public class SocketServer extends WebSocketServer {
@@ -40,57 +42,67 @@ public class SocketServer extends WebSocketServer {
         System.out.println(s);
         Message message= JSON.parseObject(s,Message.class);
         if(message.getMethodName().equals("transaction")){
-            Transaction transaction=JSON.parseObject(message.getParameter(),Transaction.class);
-            TransDetail transDetail=JSON.parseObject(transaction.getDetailStr(),TransDetail.class);
-            Encryption encryption=new Encryption();
-            try {
-                encryption.setPublicKey(transDetail.getFrom());
-            } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
-                e.printStackTrace();
-            }
-            String origin=encryption.decryptPub(transaction.getSign());
-            String goal=Hash.sha256(transaction.getDetailStr());
-            if(!(origin.equals(goal))){
-                System.out.printf("Signature check failed.%s %s",origin,goal);
-            }
-            else{
-                System.out.println("A transaction has been stored,pending for pack...");
-                if(!FullNode.toPackTrans.containsKey(goal)){
-                    FullNode.toPackTrans.put(goal,transaction.getDetailStr());
+            synchronized (FullNode.globalLock) {
+                Transaction transaction=JSON.parseObject(message.getParameter(),Transaction.class);
+                TransDetail transDetail=JSON.parseObject(transaction.getDetailStr(),TransDetail.class);
+                Encryption encryption=new Encryption();
+                try {
+                    encryption.setPublicKey(transDetail.getFrom());
+                } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+                    e.printStackTrace();
+                }
+                String origin=encryption.decryptPub(transaction.getSign());
+                String goal=Hash.sha256(transaction.getDetailStr());
+                if(!(origin.equals(goal))){
+                    System.out.printf("Signature check failed.%s %s",origin,goal);
+                }
+                else{
+                    System.out.println("A transaction has been stored,pending for pack...");
+                    if(!FullNode.toPackTrans.containsKey(goal)){
+                        FullNode.toPackTrans.put(goal,transaction.getDetailStr());
+                    }
                 }
             }
-
         }
 
         if(message.getMethodName().equals("newBlock")){
-            Block newBlock=JSON.parseObject(message.getParameter(),Block.class);
-            if(FullNode.block.size()==0||FullNode.block.get(FullNode.block.size()-1).getRootMerkleHash().equals(newBlock.getPreHash())){
-                //check whether valid
-                int count=0;
-                String BlockSha256=Hash.sha256(message.getParameter());
-                for(int i=0;i<BlockSha256.length();i++){
-                    if(BlockSha256.charAt(i)=='0') count++;
-                    else break;
-                }
-                if(count>=Config.difficulty){
-                    Vector<String> newTrans= (Vector<String>) JSON.parseArray(newBlock.getTransDetail(),String.class);
-                    Merkle merkle=new Merkle();
-                    for(String nowTrans:newTrans){
-                        merkle.add(nowTrans);
+            synchronized (FullNode.globalLock){
+                Block newBlock=JSON.parseObject(message.getParameter(),Block.class);
+                if(FullNode.block.size()==0||FullNode.block.get(FullNode.block.size()-1).getRootMerkleHash().equals(newBlock.getPreHash())){
+                    //check whether valid
+                    int count=0;
+                    String BlockSha256=Hash.sha256(message.getParameter());
+                    for(int i=0;i<BlockSha256.length();i++){
+                        if(BlockSha256.charAt(i)=='0') count++;
+                        else break;
                     }
-                    merkle.build();
-                    if(merkle.tree.get(merkle.tree.size() - 1).get(0).equals(newBlock.getRootMerkleHash())){
-                        FullNode.block.add(newBlock);
-                        System.out.println("Accept a block from other node.");
+                    if(count>=Config.difficulty){
+                        ArrayList<String> newTrans= (ArrayList<String>) JSON.parseArray(newBlock.getTransDetail(),String.class);
+                        Merkle merkle=new Merkle();
+                        for(String nowTrans:newTrans){
+                            merkle.add(nowTrans);
+                        }
+                        merkle.build();
+                        if(merkle.tree.get(merkle.tree.size() - 1).get(0).equals(newBlock.getRootMerkleHash())){
+                            FullNode.block.add(newBlock);
+                            for(String nowNewTrans:newTrans){
+                                String transHash= Hash.sha256(nowNewTrans);
+                                if(FullNode.toPackTrans.containsKey(transHash)){
+                                    FullNode.toPackTrans.remove(transHash);
+                                }
+                            }
+                            System.out.println("Accept a block from other node.");
+                        }else{
+                            System.out.println("Hash check failed");
+                        }
                     }else{
-                        System.out.println("Hash check failed");
+                        System.out.println("Difficulty check failed");
                     }
                 }else{
-                    System.out.println("Difficulty check failed");
+                    System.out.println("PreHash check failed");
                 }
-            }else{
-                System.out.println("PreHash check failed");
             }
+
         }
     }
 
