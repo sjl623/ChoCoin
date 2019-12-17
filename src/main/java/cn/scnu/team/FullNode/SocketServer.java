@@ -2,19 +2,22 @@ package cn.scnu.team.FullNode;
 
 import cn.hutool.crypto.asymmetric.RSA;
 import cn.scnu.team.API.Message;
+import cn.scnu.team.BlockChain.Block;
 import cn.scnu.team.Transaction.TransDetail;
 import cn.scnu.team.Transaction.Transaction;
+import cn.scnu.team.Util.Config;
 import cn.scnu.team.Util.Encryption;
 import cn.scnu.team.Util.Hash;
+import cn.scnu.team.Util.Merkle;
 import com.alibaba.fastjson.JSON;
 import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import javax.rmi.CORBA.Util;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Vector;
 
 public class SocketServer extends WebSocketServer {
     public SocketServer(InetSocketAddress address) {
@@ -57,6 +60,37 @@ public class SocketServer extends WebSocketServer {
                 }
             }
 
+        }
+
+        if(message.getMethodName().equals("newBlock")){
+            Block newBlock=JSON.parseObject(message.getParameter(),Block.class);
+            if(FullNode.block.size()==0||FullNode.block.get(FullNode.block.size()-1).getRootMerkleHash().equals(newBlock.getPreHash())){
+                //check whether valid
+                int count=0;
+                String BlockSha256=Hash.sha256(message.getParameter());
+                for(int i=0;i<BlockSha256.length();i++){
+                    if(BlockSha256.charAt(i)=='0') count++;
+                    else break;
+                }
+                if(count>=Config.difficulty){
+                    Vector<String> newTrans= (Vector<String>) JSON.parseArray(newBlock.getTransDetail(),String.class);
+                    Merkle merkle=new Merkle();
+                    for(String nowTrans:newTrans){
+                        merkle.add(nowTrans);
+                    }
+                    merkle.build();
+                    if(merkle.tree.get(merkle.tree.size() - 1).get(0).equals(newBlock.getRootMerkleHash())){
+                        FullNode.block.add(newBlock);
+                        System.out.println("Accept a block from other node.");
+                    }else{
+                        System.out.println("Hash check failed");
+                    }
+                }else{
+                    System.out.println("Difficulty check failed");
+                }
+            }else{
+                System.out.println("PreHash check failed");
+            }
         }
     }
 
