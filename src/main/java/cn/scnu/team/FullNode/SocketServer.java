@@ -19,6 +19,7 @@ import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
+import java.util.List;
 
 public class SocketServer extends WebSocketServer {
     public SocketServer(InetSocketAddress address) {
@@ -82,16 +83,16 @@ public class SocketServer extends WebSocketServer {
                         else break;
                     }
                     if(count>=Config.difficulty){
-                        ArrayList<String> newTrans= (ArrayList<String>) JSON.parseArray(newBlock.getTransDetail(),String.class);
+                        List<TransDetail> newTrans= newBlock.getTransDetail();
                         Merkle merkle=new Merkle();
-                        for(String nowTrans:newTrans){
-                            merkle.add(nowTrans);
+                        for(TransDetail nowTrans:newTrans){
+                            merkle.add(JSON.toJSONString(nowTrans));
                         }
                         merkle.build();
                         if(merkle.tree.get(merkle.tree.size() - 1).get(0).equals(newBlock.getRootMerkleHash())){
                             FullNode.block.add(newBlock);
-                            for(String nowNewTrans:newTrans){
-                                String transHash= Hash.sha256(nowNewTrans);
+                            for(TransDetail nowNewTrans:newTrans){
+                                String transHash= Hash.sha256(JSON.toJSONString(nowNewTrans));
                                 if(FullNode.toPackTrans.containsKey(transHash)){
                                     FullNode.toPackTrans.remove(transHash);
                                 }

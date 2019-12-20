@@ -1,8 +1,12 @@
 package cn.scnu.team.BlockChain;
 
+import cn.scnu.team.Transaction.TransDetail;
+
+import java.util.List;
+
 public class Block {
 
-    public Block(String preHash, String rootMerkleHash, String transDetail, int nonce, long timestamp, String founder) {
+    public Block(String preHash, String rootMerkleHash, List<TransDetail> transDetail, int nonce, long timestamp, String founder) {
         this.preHash = preHash;
         this.rootMerkleHash = rootMerkleHash;
         this.transDetail = transDetail;
@@ -11,11 +15,11 @@ public class Block {
         this.founder = founder;
     }
 
-    public String getTransDetail() {
+    public List<TransDetail> getTransDetail() {
         return transDetail;
     }
 
-    public void setTransDetail(String transDetail) {
+    public void setTransDetail(List<TransDetail> transDetail) {
         this.transDetail = transDetail;
     }
 
@@ -61,7 +65,7 @@ public class Block {
 
     String preHash;
     String rootMerkleHash;
-    String transDetail;
+    List<TransDetail> transDetail;
     int nonce;
     long timestamp;
     String founder;

@@ -101,7 +101,7 @@ public class Account {
             for (Block block : FullNode.block) {
                 if (block.getFounder().equals(this.info.getPublicKey())) now += Config.award;
                 System.out.println(JSON.toJSONString(block.getTransDetail()));
-                List<TransDetail> nowTrans = JSON.parseArray(block.getTransDetail(), TransDetail.class);
+                List<TransDetail> nowTrans = block.getTransDetail();
                 for (TransDetail nowTran : nowTrans) {
                     if (nowTran.getTo().equals(this.info.getPublicKey())) {
                         now += nowTran.getAmount();
@@ -128,7 +128,7 @@ public class Account {
                     Detail detail = new Detail(0, "", this.info.getPublicKey(), Config.award, String.valueOf(block.getTimestamp()));
                     nowDetails.add(detail);
                 }
-                List<TransDetail> nowTrans = JSON.parseArray(block.getTransDetail(), TransDetail.class);
+                List<TransDetail> nowTrans = block.getTransDetail();
                 for (TransDetail nowTran : nowTrans) {
                     if (nowTran.getTo().equals(this.info.getPublicKey())) {
                         Detail detail = new Detail(1, nowTran.getFrom(), nowTran.getTo(), nowTran.getAmount(), nowTran.getTimestamp());

@@ -41,14 +41,14 @@ public class FullNode {
                     e.printStackTrace();
                 }
                 synchronized (globalLock){
-                    String res=Pow.pack();
+                    Block res=Pow.pack();
                     if(res!=null){
-                        Block nowBlock=JSON.parseObject(res,Block.class);
+                        Block nowBlock=res;
                         block.add(nowBlock);
                         for (SocketClient nowSocket:nodeSocket) {
                             if(nowSocket.isOpen()){
                                 System.out.println("Send to a node");
-                                Message message=new Message("newBlock",res);
+                                Message message=new Message("newBlock",JSON.toJSONString(res));
                                 nowSocket.send(JSON.toJSONString(message));
                             }
                         }

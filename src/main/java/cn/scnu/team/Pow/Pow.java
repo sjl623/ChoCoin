@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.Vector;
 
 public class Pow {
-    public static String pack(){
+    public static Block pack(){
         Random r = new Random();
         String BlockSha256="";
         Block newBlock=null;
@@ -34,7 +34,7 @@ public class Pow {
             if(FullNode.block.size()==0) preHash= Hash.sha256("");
             else preHash= FullNode.block.get(FullNode.block.size() - 1).getRootMerkleHash();
             int nonce=r.nextInt();
-            newBlock=new Block(preHash,rootHash,JSON.toJSONString(nowAllTrans),nonce,System.currentTimeMillis(),FullNode.account.encryption.getPublicKeyStr());
+            newBlock=new Block(preHash,rootHash,nowAllTrans,nonce,System.currentTimeMillis(),FullNode.account.encryption.getPublicKeyStr());
             BlockSha256=Hash.sha256(JSON.toJSONString(newBlock));
         }
 
@@ -49,7 +49,7 @@ public class Pow {
             System.out.println("A new block has been found!!!");
             System.out.println(JSON.toJSONString(newBlock));
             System.out.println(BlockSha256);
-            return JSON.toJSONString(newBlock);
+            return newBlock;
         }else{
             return null;
         }
