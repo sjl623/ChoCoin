@@ -28,15 +28,15 @@ public class FullNode {
     public static Vector<Block> block=new Vector<>();
 
     public static Account account;
-    static final Object globalLock=new Object();
+    public static final Object globalLock=new Object();
 
     static class Pack extends Thread{
         public void run(){
             while(true){
                 //System.out.println("hi");
                 try {
-                    System.out.println(JSON.toJSONString(block));
-                    Thread.sleep(500);
+                    //System.out.println(JSON.toJSONString(block));
+                    Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
@@ -53,6 +53,7 @@ public class FullNode {
                             }
                         }
                         toPackTrans.clear();
+                        System.out.println(JSON.toJSONString(block));
                     }
                 }
 

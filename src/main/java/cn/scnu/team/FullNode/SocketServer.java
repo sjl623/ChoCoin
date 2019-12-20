@@ -1,7 +1,8 @@
 package cn.scnu.team.FullNode;
 
-import cn.hutool.crypto.asymmetric.RSA;
 import cn.scnu.team.API.Message;
+import cn.scnu.team.API.Response;
+import cn.scnu.team.Account.Account;
 import cn.scnu.team.BlockChain.Block;
 import cn.scnu.team.Transaction.TransDetail;
 import cn.scnu.team.Transaction.Transaction;
@@ -14,12 +15,10 @@ import org.java_websocket.WebSocket;
 import org.java_websocket.handshake.ClientHandshake;
 import org.java_websocket.server.WebSocketServer;
 
-import javax.rmi.CORBA.Util;
 import java.net.InetSocketAddress;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
-import java.util.Vector;
 
 public class SocketServer extends WebSocketServer {
     public SocketServer(InetSocketAddress address) {
@@ -57,10 +56,16 @@ public class SocketServer extends WebSocketServer {
                     System.out.printf("Signature check failed.%s %s",origin,goal);
                 }
                 else{
-                    System.out.println("A transaction has been stored,pending for pack...");
-                    if(!FullNode.toPackTrans.containsKey(goal)){
-                        FullNode.toPackTrans.put(goal,transaction.getDetailStr());
+                    Account account=new Account(transDetail.getFrom(),"");
+                    if(!(account.queryBalance()>=transDetail.getAmount())){
+                        System.out.println("Balance check failed.");
+                    }else{
+                        System.out.println("A transaction has been stored,pending for pack...");
+                        if(!FullNode.toPackTrans.containsKey(goal)){
+                            FullNode.toPackTrans.put(goal,transaction.getDetailStr());
+                        }
                     }
+
                 }
             }
         }
@@ -103,6 +108,20 @@ public class SocketServer extends WebSocketServer {
                 }
             }
 
+        }
+
+        if(message.getMethodName().equals("balance")){
+            Account account=new Account(message.getParameter(),"");
+            double result=account.queryBalance();
+            Response response=new Response("Balance",String.valueOf(result));
+            webSocket.send(JSON.toJSONString(response));
+        }
+
+        if(message.getMethodName().equals("detail")){
+            Account account=new Account(message.getParameter(),"");
+            String result=account.queryDetail();
+            Response response=new Response("Detail",String.valueOf(result));
+            webSocket.send(JSON.toJSONString(response));
         }
     }
 

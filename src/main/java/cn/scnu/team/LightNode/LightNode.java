@@ -69,6 +69,45 @@ public class LightNode {
         }
     }
 
+    @Command(name="balance",description = "Query the balance of an account,default to now account")
+    public static class Balance implements Runnable{
+        @Option(name={"-a"},description = "The goal account address")
+        String account="";
+
+        @Override
+        public void run() {
+            if(account.equals("")){
+                account=accountInfo.info.getPublicKey();
+            }
+            Message message=new Message("balance",account);
+            String messageStr=JSON.toJSONString(message);
+            for(SocketClient nowSocket:nodeSocket){
+                if(nowSocket.isOpen()) {nowSocket.send(messageStr);break;}
+            }
+            System.out.println(messageStr);
+        }
+    }
+
+    @Command(name="detail",description = "Query the transactions of an account")
+    public static class Detail implements Runnable{
+        @Option(name={"-a"},description = "The goal account address")
+        String account="";
+
+
+        @Override
+        public void run() {
+            if(account.equals("")){
+                account=accountInfo.info.getPublicKey();
+            }
+            Message message=new Message("detail",account);
+            String messageStr= JSON.toJSONString(message);
+            for(SocketClient nowSocket:nodeSocket){
+                if(nowSocket.isOpen()) {nowSocket.send(messageStr);break;}
+            }
+            System.out.println(messageStr);
+        }
+    }
+
     public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException, URISyntaxException {
         System.out.print("Enter account's file name:");
         scanner = new Scanner(System.in);
@@ -88,7 +127,7 @@ public class LightNode {
         Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder("ChoCoin")
                 .withDescription("ChoCoin Light node")
                 .withDefaultCommand(Help.class)
-                .withCommands(Help.class, Transfer.class);
+                .withCommands(Help.class, Transfer.class,Balance.class,Detail.class);
 
 
         Cli<Runnable> commandParser = builder.build();

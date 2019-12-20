@@ -2,6 +2,7 @@ package cn.scnu.team.Util;
 
 import com.alibaba.fastjson.JSON;
 
+import javax.rmi.CORBA.Util;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,7 +15,12 @@ public class Merkle {
     }
 
     public void build() {
-        if(info.size()==0) return;
+        if (info.size() == 0) {
+            List<String> nowLayer = new ArrayList<String>();
+            nowLayer.add(Hash.sha256("a"));
+            tree.add(nowLayer);
+            return;
+        }
         while (tree.size() == 0 || tree.get(tree.size() - 1).size() != 1) {
             List<String> nowLayer = new ArrayList<String>();
             if (tree.size() == 0) {
@@ -33,7 +39,7 @@ public class Merkle {
         }
     }
 
-    public void output(){
+    public void output() {
         System.out.println(JSON.toJSONString(tree));
     }
 
