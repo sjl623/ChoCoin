@@ -7,6 +7,7 @@ import cn.scnu.team.SeedNode.SeedSocketClient;
 import cn.scnu.team.FullNode.SocketClient;
 import cn.scnu.team.Transaction.TransDetail;
 import cn.scnu.team.Transaction.Transaction;
+import cn.scnu.team.Util.Config;
 import cn.scnu.team.Util.Hash;
 import com.alibaba.fastjson.JSON;
 import io.airlift.airline.*;
@@ -108,6 +109,15 @@ public class LightNode {
         }
     }
 
+    @Command(name="address",description = "display your wallet address")
+    public static class Address implements Runnable{
+
+        @Override
+        public void run() {
+            System.out.printf("%s\n",accountInfo.encryption.getPublicKeyStr());
+        }
+    }
+
     public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException, URISyntaxException {
         System.out.print("Enter account's file name:");
         scanner = new Scanner(System.in);
@@ -115,7 +125,7 @@ public class LightNode {
         accountInfo = new Account();
         accountInfo.loadInfo(filename);
 
-        seedSocketClient = new SeedSocketClient(new URI("ws://localhost:5000"), false);
+        seedSocketClient = new SeedSocketClient(new URI(Config.nodeAdd), false);
         seedSocketClient.connect();
         System.out.println("Linking to the seed node...");
         while (!seedSocketClient.getReadyState().equals(ReadyState.OPEN)) {
@@ -127,11 +137,11 @@ public class LightNode {
         Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder("ChoCoin")
                 .withDescription("ChoCoin Light node")
                 .withDefaultCommand(Help.class)
-                .withCommands(Help.class, Transfer.class,Balance.class,Detail.class);
+                .withCommands(Help.class, Transfer.class,Balance.class,Detail.class,Address.class);
 
 
         Cli<Runnable> commandParser = builder.build();
-
+        System.out.println("Welcome to use ChoCoin,type \"help\" to get help");
         while (true) {
             String nowCom = scanner.nextLine();
             String[] nowArg = nowCom.split(" ");

@@ -50,6 +50,7 @@ public class SeedSocketClient extends WebSocketClient {
     public void onError(Exception e) {
         System.out.println("Connect seed server failed");
         try {
+            System.exit(0);
             throw e;
         } catch (Exception ex) {
             ex.printStackTrace();
