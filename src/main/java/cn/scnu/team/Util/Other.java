@@ -4,7 +4,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class Other {
-    public static String timeStamp2Date(String seconds,String format) {
+    public static String timeStamp2Date(String seconds,String format) {//时间格式转换
         if(seconds == null || seconds.isEmpty() || seconds.equals("null")){
             return "";
         }

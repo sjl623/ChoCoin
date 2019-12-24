@@ -59,7 +59,7 @@ public class Account {
     }
 
 
-    public void loadInfo(String path) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {
+    public void loadInfo(String path) throws IOException, InvalidKeySpecException, NoSuchAlgorithmException {//加载账户文件
         //File file=new File(path);
         boolean isExists = true;
         try {
@@ -94,7 +94,7 @@ public class Account {
 
     }
 
-    public double queryBalance() {
+    public double queryBalance() {//查询余额
         double now = 0;
         synchronized (FullNode.globalLock) {
             System.out.println(JSON.toJSONString(FullNode.block));
@@ -120,7 +120,7 @@ public class Account {
         return now;
     }
 
-    public String queryDetail() {
+    public String queryDetail() {//查询交易明细
         synchronized (FullNode.globalLock) {
             ArrayList<Detail> nowDetails = new ArrayList<Detail>();
             for (Block block : FullNode.block) {

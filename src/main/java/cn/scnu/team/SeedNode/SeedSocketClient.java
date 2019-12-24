@@ -28,7 +28,7 @@ public class SeedSocketClient extends WebSocketClient {
     public void onMessage(String s) {
         //System.out.println(s);
         Response response=JSON.parseObject(s,Response.class);
-        if(response.getType().equals("nodeList")){
+        if(response.getType().equals("nodeList")){//处理查询节点列表请求
             List<NodeInfo> nodeInfo= JSON.parseArray(response.getContent(),NodeInfo.class);
             for(int i=0;i<nodeInfo.size();i++){
                 try {

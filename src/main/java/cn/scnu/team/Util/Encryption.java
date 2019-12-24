@@ -31,7 +31,7 @@ public class Encryption {
         this.rsa = new RSA();
     }
 
-    public void randomPairKey() throws InvalidKeySpecException, NoSuchAlgorithmException {
+    public void randomPairKey() throws InvalidKeySpecException, NoSuchAlgorithmException {//随机生成秘钥
         KeyPair pair = SecureUtil.generateKeyPair("RSA");
         String privateKey = Base64.encode(pair.getPrivate().getEncoded());
         String publicKey = Base64.encode(pair.getPublic().getEncoded());
@@ -61,17 +61,17 @@ public class Encryption {
 
     public String encryptPub(String input) {
         return Base64.encode(rsa.encrypt(input, KeyType.PublicKey));
-    }
+    }//公钥加密
 
     public String encryptPrivate(String input) {
         return Base64.encode(rsa.encrypt(input, KeyType.PrivateKey));
-    }
+    }//公钥解密
 
-    public String decryptPub(String input) {
+    public String decryptPub(String input) {//公钥解密
         return new String(rsa.decrypt(Base64.decode(input), KeyType.PublicKey));
     }
 
-    public String decryptPrivate(String input) {
+    public String decryptPrivate(String input) {//私钥解密
         return new String(rsa.decrypt(Base64.decode(input), KeyType.PrivateKey));
     }
 

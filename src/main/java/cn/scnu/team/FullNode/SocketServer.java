@@ -53,7 +53,7 @@ public class SocketServer extends WebSocketServer {
                 }
                 String origin=encryption.decryptPub(transaction.getSign());
                 String goal=Hash.sha256(transaction.getDetailStr());
-                if(!(origin.equals(goal))){
+                if(!(origin.equals(goal))){//交易签名校验
                     System.out.printf("Signature check failed.%s %s",origin,goal);
                 }
                 else{
@@ -74,7 +74,7 @@ public class SocketServer extends WebSocketServer {
         if(message.getMethodName().equals("newBlock")){
             synchronized (FullNode.globalLock){
                 Block newBlock=JSON.parseObject(message.getParameter(),Block.class);
-                if(FullNode.block.size()==0||FullNode.block.get(FullNode.block.size()-1).getRootMerkleHash().equals(newBlock.getPreHash())){
+                if(FullNode.block.size()==0||FullNode.block.get(FullNode.block.size()-1).getRootMerkleHash().equals(newBlock.getPreHash())){//交易hash校验
                     //check whether valid
                     int count=0;
                     String BlockSha256=Hash.sha256(message.getParameter());
@@ -82,14 +82,14 @@ public class SocketServer extends WebSocketServer {
                         if(BlockSha256.charAt(i)=='0') count++;
                         else break;
                     }
-                    if(count>=Config.difficulty){
+                    if(count>=Config.difficulty){//难度校验
                         List<TransDetail> newTrans= newBlock.getTransDetail();
                         Merkle merkle=new Merkle();
                         for(TransDetail nowTrans:newTrans){
                             merkle.add(JSON.toJSONString(nowTrans));
                         }
                         merkle.build();
-                        if(merkle.tree.get(merkle.tree.size() - 1).get(0).equals(newBlock.getRootMerkleHash())){
+                        if(merkle.tree.get(merkle.tree.size() - 1).get(0).equals(newBlock.getRootMerkleHash())){//hash 校验
                             FullNode.block.add(newBlock);
                             for(TransDetail nowNewTrans:newTrans){
                                 String transHash= Hash.sha256(JSON.toJSONString(nowNewTrans));

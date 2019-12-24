@@ -137,7 +137,7 @@ public class LightNode {
         Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder("ChoCoin")
                 .withDescription("ChoCoin Light node")
                 .withDefaultCommand(Help.class)
-                .withCommands(Help.class, Transfer.class,Balance.class,Detail.class,Address.class);
+                .withCommands(Help.class, Transfer.class,Balance.class,Detail.class,Address.class);//注册命令行对象
 
 
         Cli<Runnable> commandParser = builder.build();

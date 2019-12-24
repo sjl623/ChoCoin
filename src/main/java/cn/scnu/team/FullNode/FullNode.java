@@ -32,7 +32,7 @@ public class FullNode {
 
     static class Pack extends Thread{
         public void run(){
-            while(true){
+            while(true){//尝试打包交易
                 //System.out.println("hi");
                 try {
                     //System.out.println(JSON.toJSONString(block));
@@ -79,7 +79,7 @@ public class FullNode {
         }
     }
 
-    private static class updateNode extends TimerTask {
+    private static class updateNode extends TimerTask {//定时任务，更新相邻节点
         @Override
         public void run(){
             if(nodeSocket.size()<=200){//get new node while connection less 200
@@ -88,7 +88,7 @@ public class FullNode {
         }
     }
 
-    private static class syncBlock extends TimerTask {
+    private static class syncBlock extends TimerTask {//定时任务，同步区块
         @Override
         public void run(){
             for (SocketClient nowSocket:nodeSocket) {

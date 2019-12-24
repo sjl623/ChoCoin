@@ -42,7 +42,7 @@ public class SeedNode {
         @Override
         public void onMessage(WebSocket webSocket, String s) {
             Message message = JSON.parseObject(s, Message.class);
-            if (message.methodName.equals("add")) {
+            if (message.methodName.equals("add")) {//处理新增节点的请求
                 NodeInfo nodeInfo = JSON.parseObject(message.parameter,NodeInfo.class);
                 String now=webSocket.getRemoteSocketAddress().getHostString()+":"+String.valueOf(nodeInfo.port);
                 //System.out.println(now);
@@ -53,7 +53,7 @@ public class SeedNode {
                 }
             }
 
-            if(message.methodName.equals("query")){
+            if(message.methodName.equals("query")){//处理查询请求
                 Vector<NodeInfo> allNode=new Vector<NodeInfo>();
                 for(NodeInfo now:isLog.values()){
                     allNode.add(now);

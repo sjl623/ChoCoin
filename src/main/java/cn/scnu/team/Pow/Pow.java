@@ -12,7 +12,7 @@ import java.util.Random;
 import java.util.Vector;
 
 public class Pow {
-    public static Block pack(){
+    public static Block pack(){//挖矿实现
         Random r = new Random();
         String BlockSha256="";
         Block newBlock=null;

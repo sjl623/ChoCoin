@@ -53,7 +53,7 @@ public class SocketClient extends WebSocketClient {
                 }
             }
         }
-        if (response.getType().equals("newBlock")) {
+        if (response.getType().equals("newBlock")) {//新增节点请求
             synchronized (FullNode.globalLock) {
                 Block newBlock = JSON.parseObject(response.getContent(), Block.class);
                 if (FullNode.block.size() == 0 || FullNode.block.get(FullNode.block.size() - 1).getRootMerkleHash().equals(newBlock.getPreHash())) {
