@@ -88,6 +88,19 @@ public class FullNode {
         }
     }
 
+    private static class syncBlock extends TimerTask {
+        @Override
+        public void run(){
+            for (SocketClient nowSocket:nodeSocket) {
+                if(nowSocket.isOpen()){
+                    System.out.printf("Try to sync %d block...\n",block.size());
+                    Message message=new Message("getBlock",String.valueOf(block.size()));
+                    nowSocket.send(JSON.toJSONString(message));
+                }
+            }
+        }
+    }
+
     public static void addNode(NodeInfo newNodeInfo) throws URISyntaxException {
         synchronized (FullNode.globalLock){
             if(!isConnect.containsKey(newNodeInfo.address+":"+newNodeInfo.port)){
@@ -127,6 +140,9 @@ public class FullNode {
 
         Timer nodeQueryTimer=new Timer();
         nodeQueryTimer.scheduleAtFixedRate(new updateNode(),1000,5000);
+
+        Timer syncBlockTimer=new Timer();
+        syncBlockTimer.scheduleAtFixedRate(new syncBlock(),1000,5000);
 
         Thread pack =new Pack();
         pack.start();

@@ -124,6 +124,15 @@ public class SocketServer extends WebSocketServer {
             Response response=new Response("Detail",String.valueOf(result));
             webSocket.send(JSON.toJSONString(response));
         }
+
+        if(message.getMethodName().equals("getBlock")){
+            int id=Integer.parseInt(message.getParameter());
+            if(FullNode.block.size()>id){
+                Block nowBlock=FullNode.block.get(id);
+                Response response=new Response("newBlock",JSON.toJSONString(nowBlock));
+                webSocket.send(JSON.toJSONString(response));
+            }
+        }
     }
 
     @Override

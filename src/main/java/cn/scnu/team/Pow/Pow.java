@@ -39,7 +39,7 @@ public class Pow {
         }
 
 
-        System.out.println(BlockSha256);
+        //System.out.println(BlockSha256);
         int count=0;
         for(int i=0;i<BlockSha256.length();i++){
             if(BlockSha256.charAt(i)=='0') count++;
