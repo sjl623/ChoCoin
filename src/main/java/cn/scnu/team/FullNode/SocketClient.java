@@ -61,7 +61,7 @@ public class SocketClient extends WebSocketClient {
         try {
             throw e;
         } catch (Exception ex) {
-            ex.printStackTrace();
+            System.out.println("Connect to a node failed.");
         }
     }
 }

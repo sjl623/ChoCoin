@@ -105,7 +105,7 @@ public class SocketServer extends WebSocketServer {
                         System.out.println("Difficulty check failed");
                     }
                 }else{
-                    System.out.println("PreHash check failed");
+                    System.out.println("PreHash check failed,pending to sync to the main chain.");
                 }
             }
 

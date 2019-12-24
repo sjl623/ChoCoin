@@ -15,13 +15,13 @@ import java.net.InetSocketAddress;
 import java.net.URI;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimerTask;
 import java.util.Vector;
 
 public class SeedNode {
 
-
-    private static Vector<NodeInfo> allNode;
-    private static Map<String, Boolean> isLog= new HashMap<>();
+    private static Map<String, NodeInfo> isLog= new HashMap<>();
+    static Object GlobalLock=new Object();
 
     public static class SeedServer extends WebSocketServer {
 
@@ -46,18 +46,22 @@ public class SeedNode {
                 NodeInfo nodeInfo = JSON.parseObject(message.parameter,NodeInfo.class);
                 String now=webSocket.getRemoteSocketAddress().getHostString()+":"+String.valueOf(nodeInfo.port);
                 //System.out.println(now);
-                Boolean isExisted=isLog.get(now);
-                if(isExisted==null||!isExisted) {
-                    allNode.add(new NodeInfo(webSocket.getRemoteSocketAddress().getHostString(), nodeInfo.port));
-                    isLog.put(now, true);
+                if(!isLog.containsKey(now)) {
+                    //allNode.add(new NodeInfo(webSocket.getRemoteSocketAddress().getHostString(), nodeInfo.port));
+                    isLog.put(now, nodeInfo);
                     System.out.printf("A node from %s:%d added\n", webSocket.getRemoteSocketAddress().getHostString(), nodeInfo.port);
                 }
             }
 
             if(message.methodName.equals("query")){
+                Vector<NodeInfo> allNode=new Vector<NodeInfo>();
+                for(NodeInfo now:isLog.values()){
+                    allNode.add(now);
+                }
                 String result= JSON.toJSONString(allNode);
                 Response response=new Response("nodeList",result);
                 webSocket.send(JSON.toJSONString(response));
+                System.out.println(JSON.toJSONString(response));
             }
 
         }
@@ -74,9 +78,9 @@ public class SeedNode {
         @Override
         public void onStart() {
             System.out.printf("Seed Server started in %s:%d\n", this.getAddress().getHostString(), this.getAddress().getPort());
-            allNode= new Vector<>();
         }
     }
+
 
     public static void main(String[] args) throws IOException, InterruptedException {
         SeedServer seedServer = new SeedServer(new InetSocketAddress("localhost", 5000));

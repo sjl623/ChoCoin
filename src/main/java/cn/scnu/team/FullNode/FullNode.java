@@ -91,8 +91,13 @@ public class FullNode {
     public static void addNode(NodeInfo newNodeInfo) throws URISyntaxException {
         synchronized (FullNode.globalLock){
             if(!isConnect.containsKey(newNodeInfo.address+":"+newNodeInfo.port)){
-                SocketClient socketClient=new SocketClient(new URI("ws://"+newNodeInfo.address+":"+newNodeInfo.port));
-                socketClient.connect();
+                try{
+                    SocketClient socketClient=new SocketClient(new URI("ws://"+newNodeInfo.address+":"+newNodeInfo.port));
+                    socketClient.connect();
+                }catch (Exception e){
+                    return;//connection failed;
+                }
+
                 isConnect.put(newNodeInfo.address+":"+newNodeInfo.port,true);
                 //nodeSocket.add(socketClient);
             }
