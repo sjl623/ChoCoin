@@ -7,6 +7,7 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="P_Coin" />
+        <module name="ChoCoin" />
       </profile>
     </annotationProcessing>
   </component>

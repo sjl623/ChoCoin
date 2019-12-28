@@ -1,6 +1,7 @@
 package cn.scnu.team.BlockChain;
 
 import cn.scnu.team.Transaction.TransDetail;
+import cn.scnu.team.Transaction.UTXO_Transaction;
 
 import java.util.List;
 
@@ -59,14 +60,19 @@ public class Block {
         return founder;
     }
 
+    public List<UTXO_Transaction> getTransactions(){
+        return transactions;
+    }
     public void setFounder(String founder) {
         this.founder = founder;
     }
 
-    String preHash;
-    String rootMerkleHash;
-    List<TransDetail> transDetail;
-    int nonce;
-    long timestamp;
-    String founder;
+    private String preHash;
+    private String rootMerkleHash;
+    private List<TransDetail> transDetail;
+    private int nonce;
+    private long timestamp;
+    private String founder;
+
+    private List<UTXO_Transaction> transactions;
 }

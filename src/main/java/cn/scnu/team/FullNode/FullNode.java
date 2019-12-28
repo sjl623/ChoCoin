@@ -6,8 +6,7 @@ import cn.scnu.team.Account.Account;
 import cn.scnu.team.BlockChain.Block;
 import cn.scnu.team.Pow.Pow;
 import cn.scnu.team.SeedNode.SeedSocketClient;
-import cn.scnu.team.Util.Hash;
-import cn.scnu.team.Util.Merkle;
+import cn.scnu.team.Transaction.TXOutput;
 import com.alibaba.fastjson.JSON;
 import org.java_websocket.enums.ReadyState;
 
@@ -26,7 +25,17 @@ public class FullNode {
 
     public static Map<String,String> toPackTrans=new HashMap<>();
     public static Vector<Block> block=new Vector<>();
+    public static Map<String, TXOutput[]> utxos=new HashMap<>();
 
+   /* public static TXOutput[] getOutputsByPubKeyInUtxos(String key){
+        TXOutput[] txOutputs={};
+        for(TXOutput txOutput:utxos){
+            if(txOutput.getPublicKeyHash()==key){
+                ArrayUtils.add(txOutputs,txOutput);
+            }
+        }
+        return txOutputs;
+    }*/
     public static Account account;
     public static final Object globalLock=new Object();
 

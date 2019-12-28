@@ -47,7 +47,7 @@ public class Account {
     }
 
     public AccountInfo info;
-    public Encryption encryption;
+    public Encryption encryption;//加密
 
     public Account() {
         encryption = new Encryption();
@@ -112,7 +112,7 @@ public class Account {
                 }
             }
             for (String nowTran : FullNode.toPackTrans.values()) {
-                TransDetail nowTranClass = (TransDetail) JSON.parseObject(nowTran, TransDetail.class);
+                TransDetail nowTranClass = JSON.parseObject(nowTran, TransDetail.class);
                 if (nowTranClass.getFrom().equals(this.info.getPublicKey())) now -= nowTranClass.getAmount();
 
             }

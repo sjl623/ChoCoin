@@ -22,6 +22,11 @@
 
   <dependencies>
     <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-lang3</artifactId>
+      <version>3.7</version>
+    </dependency>
+    <dependency>
       <groupId>com.alibaba</groupId>
       <artifactId>fastjson</artifactId>
       <version>1.2.61</version>
@@ -56,6 +61,12 @@
       <groupId>io.airlift</groupId>
       <artifactId>airline</artifactId>
       <version>0.8</version>
+    </dependency>
+    <!-- 加密算法 -->
+    <dependency>
+      <groupId>org.bouncycastle</groupId>
+      <artifactId>bcprov-jdk15on</artifactId>
+      <version>1.59</version>
     </dependency>
 
   </dependencies>
