@@ -117,6 +117,68 @@ public class LightNode {
             System.out.printf("%s\n",accountInfo.encryption.getPublicKeyStr());
         }
     }
+/***************Here are the functions about GUI.**************************************/
+    public static String getAddress(){
+        //返回公钥
+        return accountInfo.encryption.getPublicKeyStr();
+    }
+
+    public static String getBalance(){
+        //返回余额
+        String  account=accountInfo.info.getPublicKey();
+        Message message=new Message("balance",account);
+        String messageStr=JSON.toJSONString(message);
+        for(SocketClient nowSocket:nodeSocket){
+            if(nowSocket.isOpen()) {nowSocket.send(messageStr);break;}
+        }
+         return messageStr;
+    }
+
+    public static void Transfer(String account, Double amount){
+        TransDetail transDetail = new TransDetail(accountInfo.info.getPublicKey(), account, amount, String.valueOf(System.currentTimeMillis()));
+        String transDetailStr = JSON.toJSONString(transDetail);
+        String detailHash= Hash.sha256(transDetailStr);
+        Transaction transaction = new Transaction(transDetailStr, accountInfo.encryption.encryptPrivate(detailHash));
+        String transactionStr = JSON.toJSONString(transaction);
+        Message message=new Message("transaction",transactionStr);
+        String messageStr=JSON.toJSONString(message);
+        for (SocketClient nowSocket:nodeSocket) {
+            if (nowSocket.isOpen()) nowSocket.send(messageStr);
+        }
+    }
+
+    public static void main(String filename)throws InvalidKeySpecException, NoSuchAlgorithmException, IOException, URISyntaxException{
+        accountInfo = new Account();
+        accountInfo.loadInfo(filename);
+        seedSocketClient = new SeedSocketClient(new URI(Config.nodeAdd), false);
+        seedSocketClient.connect();
+
+        while (!seedSocketClient.getReadyState().equals(ReadyState.OPEN)) {
+        }
+        Timer nodeQueryTimer = new Timer();
+        nodeQueryTimer.scheduleAtFixedRate(new updateNode(), 1000, 5000);
+
+
+        Cli.CliBuilder<Runnable> builder = Cli.<Runnable>builder("ChoCoin")
+                .withDescription("ChoCoin Light node")
+                .withDefaultCommand(Help.class)
+                .withCommands(Help.class, Transfer.class,Balance.class,Detail.class,Address.class);//注册命令行对象
+
+        Cli<Runnable> commandParser = builder.build();
+    }
+
+    public static String getDetails(){
+        String account=accountInfo.info.getPublicKey();
+        Message message=new Message("detail",account);
+        String messageStr= JSON.toJSONString(message);
+        for(SocketClient nowSocket:nodeSocket){
+            if(nowSocket.isOpen()) {nowSocket.send(messageStr);break;}
+        }
+        return messageStr;
+    }
+
+/***************Here are the functions about GUI above.**************************************/
+
 
     public static void main(String[] args) throws InvalidKeySpecException, NoSuchAlgorithmException, IOException, URISyntaxException {
         System.out.print("Enter account's file name:");
@@ -124,7 +186,6 @@ public class LightNode {
         String filename = scanner.nextLine();
         accountInfo = new Account();
         accountInfo.loadInfo(filename);
-
         seedSocketClient = new SeedSocketClient(new URI(Config.nodeAdd), false);
         seedSocketClient.connect();
         System.out.println("Linking to the seed node...");
@@ -152,8 +213,5 @@ public class LightNode {
                 System.out.println("Invalid command,type \"help\" for usage instructions.");
             }
         }
-
     }
-
-
 }
