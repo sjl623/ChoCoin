@@ -16,7 +16,8 @@ public class mainPage {
 
     public static void main() {
         JFrame frame = new JFrame("mainPage");
-        frame.setContentPane(new mainPage().mainPage);
+        LightNode.mainPage=new mainPage();
+        frame.setContentPane(LightNode.mainPage.mainPage);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.pack();
         frame.setVisible(true);
@@ -32,6 +33,10 @@ public class mainPage {
     private JTextArea MyAccountDetailsTextArea;
     private JButton detailsButton;
     private JTextField MyAccountDetailsTextField;
+
+    public void setBalance(double balance){
+        MyBalancetextField.setText(String.valueOf(balance));
+    };
 
     public mainPage() {
 

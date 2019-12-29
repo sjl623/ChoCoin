@@ -3,6 +3,7 @@ package cn.scnu.team.FullNode;
 import cn.scnu.team.API.NodeInfo;
 import cn.scnu.team.API.Response;
 import cn.scnu.team.BlockChain.Block;
+import cn.scnu.team.LightNode.LightNode;
 import cn.scnu.team.Transaction.Detail;
 import cn.scnu.team.Transaction.TransDetail;
 import cn.scnu.team.Util.Config;
@@ -35,8 +36,9 @@ public class SocketClient extends WebSocketClient {
     public void onMessage(String s) {
         System.out.println(s);
         Response response = JSON.parseObject(s, Response.class);
-        if (response.getType().equals("balance")) {
+        if (response.getType().equals("Balance")) {
             System.out.printf("The balance is %s.\n", response.getContent());
+            LightNode.mainPage.setBalance(Double.parseDouble(response.getContent()));
         }
         if (response.getType().equals("Detail")) {
             System.out.println("Here are the details of the given account");

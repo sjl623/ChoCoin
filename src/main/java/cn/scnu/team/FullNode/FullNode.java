@@ -4,6 +4,7 @@ import cn.scnu.team.API.Message;
 import cn.scnu.team.API.NodeInfo;
 import cn.scnu.team.Account.Account;
 import cn.scnu.team.BlockChain.Block;
+import cn.scnu.team.LightNode.mainPage;
 import cn.scnu.team.Pow.Pow;
 import cn.scnu.team.SeedNode.SeedSocketClient;
 import cn.scnu.team.Transaction.TXOutput;
@@ -17,6 +18,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 public class FullNode {
+
     private static SocketServer socketServer;
     private static SeedSocketClient seedSocketClient;
 

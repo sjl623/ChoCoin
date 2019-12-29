@@ -26,6 +26,8 @@ public class LightNode {
     private static Vector<SocketClient> nodeSocket = new Vector<>();
     private static SeedSocketClient seedSocketClient;
 
+    public static mainPage mainPage;
+
     static Scanner scanner;
     static Account accountInfo;
 
@@ -131,7 +133,7 @@ public class LightNode {
         for(SocketClient nowSocket:nodeSocket){
             if(nowSocket.isOpen()) {nowSocket.send(messageStr);break;}
         }
-         return messageStr;
+         return "";
     }
 
     public static void Transfer(String account, Double amount){
